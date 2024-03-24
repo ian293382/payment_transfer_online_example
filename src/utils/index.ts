@@ -14,3 +14,11 @@ export const createDatabase = () => {
             pool: {min: 2, max: 10},
     })
 }
+
+export  const isJson = (value: string) => {
+    try { 
+        return Boolean(JSON.parse(value));
+    }catch (e) {
+        return false;
+    }
+}
