@@ -11,9 +11,7 @@ pre_order: number;
 price: number;
 }
 
-export interface IProductModel extends IBase<Product> {
-
-}
+export interface IProductModel extends IBase<Product> {}
 
 export class ProductModel extends  Base<Product>  implements IProductModel{
     tableName = 'products';
