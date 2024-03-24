@@ -16,7 +16,7 @@ export const controllerManager = ({
     });
 
     return {
-        productController,
+         ProductController: productController,
     };
 
 };

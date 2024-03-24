@@ -61,12 +61,13 @@ export abstract class Base<T> implements IBase<T> {
         await sqlBuilder; // 會顯示成功幾筆資料
         return await this.findOne(id, trx);
     }
-    public delete = async (id: any, trx? : Knex.Transaction) => {
-        let sqlBuilder = this.knexSql(this.tableName).update(this.DataObject2DBData(data)).where({id}).del();    
+    public delete = async (id: any, trx?: Knex.Transaction) => {
+        let sqlBuilder = this.knexSql(this.tableName).where({ id }).del();
         if (trx)  sqlBuilder = sqlBuilder.transacting(trx);
         await sqlBuilder; // 會顯示成功幾筆資料
         return; // delete  => return null 表示刪除成功 
     };
+    
 
     private DBData2DataObject = (data: any) => {
         // 轉成  updatedAT createdAT camelCase

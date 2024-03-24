@@ -16,7 +16,7 @@ class App {
   public app: express.Application;
   private knexSql: Knex;
   private modelCtx: ModelContext;
-  controllerCtx: ControllerContext;
+  private controllerCtx: ControllerContext;
 
   constructor() {
     this.app = express();
