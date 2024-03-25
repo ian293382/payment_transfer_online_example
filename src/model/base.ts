@@ -2,7 +2,7 @@ import { isJson } from "@/utils";
 import { Knex } from "knex";
 import { camelCase, isEmpty, mapKeys, mapValues, snakeCase } from "lodash";
 
-// T 在這個階段，先不要給他真正的類別; 而是等檔其他繼承他的Class 要用到的時候再傳入型別;
+// T = table 在這個階段，先不要給他真正的類別 ( 抽象 ); 而是等檔其他繼承他的Class 要用到的時候再傳入型別;
 // database transaction (trx任意縮寫 Knex.Transaction) 資料庫交易 => 保證多表格的欄位變動可以一起完成 或失敗
 // select 找一筆定癲 , uopdate 將錢轉出, create 創建 Log , select 找出更新訂單, ...
 export interface IBase<T> {
@@ -41,7 +41,7 @@ export abstract class Base<T> implements IBase<T> {
         if (trx)  sqlBuilder = sqlBuilder.transacting(trx);
         const result = await sqlBuilder;
         if (isEmpty(result)) return null; 
-        
+        // 只要找一個
         return this.DBData2DataObject(result[0]) as T;
     }
     public create = async (data: Omit<T, 'id'>, trx? : Knex.Transaction) => {
