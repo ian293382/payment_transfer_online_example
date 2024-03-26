@@ -12,6 +12,7 @@ import { createDatabase } from './utils';
 import { ModelContext, modelManager } from './manager/modelManager';
 import { ControllerContext, controllerManager } from './manager/controllerManager';
 import { mountProductRouter } from './routes/product';
+import { mountOrderRouter } from './routes/order';
 
 class App {
   public app: express.Application;
@@ -25,7 +26,10 @@ class App {
     this.knexSql = createDatabase();
 
     this.modelCtx = modelManager({ knexSql: this.knexSql });
-    this.controllerCtx = controllerManager({ modelCtx: this.modelCtx });
+    this.controllerCtx = controllerManager({
+        knexSql: this.knexSql,
+        modelCtx: this.modelCtx,
+    });
 
     this.routerSetup();
     this.errorHandler();
@@ -56,6 +60,10 @@ class App {
     this.app.use(
       '/products',
       mountProductRouter({ controllerCtx: this.controllerCtx })
+    );
+    this.app.use(
+      '/orders',
+      mountOrderRouter({ controllerCtx: this.controllerCtx })
     );
   }
 

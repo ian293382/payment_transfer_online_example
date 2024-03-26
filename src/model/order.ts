@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { Base } from "./base";
+import { Base, IBase } from "./base";
 
 // 處理 enum
 export enum PaymentProvider {
@@ -7,7 +7,7 @@ export enum PaymentProvider {
     PAYPAL = 'PAYPAL',
 }
 
-export enum PaymentWay {
+export enum PaymentPay {
     CVS = 'cvs',
     PAYPAL = 'PAYPAL',
 }
@@ -33,12 +33,18 @@ export interface Order {
     createdAt: Date;
     updatedAt: Date;
     paymentProvider: PaymentProvider;
-    paymentPay: PaymentWay;
+    paymentPay: PaymentPay;
     status: OrderStatus;
     contents: OrderContents[];
 }
 
-export class OrderModel extends Base<Order> {
+// 建立抽象介面
+export interface IOrderModel extends IBase<Order> {
+// 沒有需要新增的功能
+}
+
+// 實現它
+export class OrderModel extends Base<Order> implements IOrderModel{
     tableName = 'orders';
     // schema 要對應資料庫裡面的格式 title 例如 `id` 
     schema = {
