@@ -123,9 +123,8 @@ export class OrderController implements IOrderController {
         }
 
         // 實際處理
-            
+        // 2, 寫入database transaction
         
-        // 2, 寫入database
         // 3. 金流api
         res.json({ status: 'success' });
     };
