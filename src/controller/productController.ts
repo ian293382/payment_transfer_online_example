@@ -10,7 +10,7 @@ export interface IProductController {
     findAll(
         req: Request<any, any, any, any>,
         res: Response,
-        next: NextFunction
+        _next: NextFunction
     ): void;
 }
 
