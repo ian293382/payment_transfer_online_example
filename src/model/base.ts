@@ -13,11 +13,12 @@ export interface IBase<T> {
     delete(id: any, trx? : Knex.Transaction): Promise<void>;
 }
 
+// 這個base 是不能夠被instance出來的而是等到調用後 所以給他abstract的類別;
 export abstract class Base<T> implements IBase<T> {
     protected knexSql: Knex;
     protected tableName: string = '';
     protected schema = {};
-
+    // 要讓app傳入這裡 一個 Knex.js SQl查詢器 一個TableName
     constructor( {knexSql, tableName }: { knexSql: Knex, tableName?: string} ) {
         this.knexSql = knexSql;
         if (tableName) this.tableName = tableName;
