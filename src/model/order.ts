@@ -36,6 +36,12 @@ export interface Order {
     contents: OrderContent[];
 }
 
+
+// 補實作 IOrderModel
+export interface IOrderModel extends IBase<Order>{
+    // 目前沒有新功能 就保持空值
+}
+
 // 上述定義 下面要實作他的方法 
 export class OrderModel extends Base<Order>  implements IBase<Order> {
     protected tableName = 'orders';
