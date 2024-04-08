@@ -3,6 +3,7 @@ import { ProductController, IProductController } from '@/controller/productContr
 
 export interface ControllerContext {
     ProductController: IProductController;
+    orderController: IOrderController;
 }
 
 
