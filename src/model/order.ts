@@ -43,8 +43,8 @@ export interface IOrderModel extends IBase<Order>{
 }
 
 // 上述定義 下面要實作他的方法 
-export class OrderModel extends Base<Order>  implements IBase<Order> {
-    protected tableName = 'orders';
+export class OrderModel extends Base<Order>  implements IBase<Order>{
+    tableName = 'orders';
     // 要把功能寫出來時 記得js裡面是 駝峰裝的key值 ，資料庫判別適用底線命名的 左邊 js = database
     protected schema = {
         id: `id`,
@@ -57,12 +57,12 @@ export class OrderModel extends Base<Order>  implements IBase<Order> {
         contents: `contents`,       
     };
 
-    static createConstructor = ({ 
+    static createModel = ({ 
         knexSql,
         tableName,
     }: { 
         knexSql: Knex;
-        tableName: string; 
+        tableName?: string; 
     }) => {
         return new OrderModel({  knexSql, tableName });
     };

@@ -18,7 +18,7 @@ export interface IProductController {
 export class ProductController implements IProductController{
     private productModel: IProductModel;
 
-    public static createConstructor = ({ productModel }: ProductControllerProp) => {
+    public static createController = ({ productModel }: ProductControllerProp) => {
         return new ProductController({ productModel });
     }
 

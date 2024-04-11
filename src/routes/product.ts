@@ -8,7 +8,7 @@ export const mountProductRouter = ({
 }) => {
     let router = express.Router();
 
-    router.get('/list', controllerCtx.ProductController.findAll)
+    router.get('/list', controllerCtx.productController.findAll)
 
     return router;
 };

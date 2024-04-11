@@ -1,11 +1,11 @@
-import { OrderContent, OrderModel, PaymentPay, PaymentProvider } from "@/model/order";
+import { IOrderModel, OrderContent, OrderModel, PaymentPay, PaymentProvider } from "@/model/order";
 import { IProductModel } from "@/model/product";
 import { NextFunction, Request, Response } from "express";
 import { Knex } from "knex";
 
 interface CreateOrderRequestParams {
     paymentProvider: PaymentProvider;
-    paymentPay: PaymentPay;
+    PaymentPay: PaymentPay;
     contents: OrderContent[];
     // clientRedirect: string;
 }
@@ -18,23 +18,41 @@ export interface IOrderController {
         req: Request<any, any, CreateOrderRequestParams, any>,
         res: Response,
         next: NextFunction): void;
-    updateOrder(req: Request<any, any, any, any>, res: Response, next: NextFunction): void;
+    updateOrder(
+        req: Request<any, any, any, any>,
+        res: Response,
+        next: NextFunction): void;
 }
 
 // 實作功能 implements
 export class OrderController implements IOrderController {
+    //  第一步 需要transaction 的功能 這功能是由 app來 所以設定接口  先設參數在設定裡面的建構函數 下方建立constructor
     knexSql: Knex<any, any[]>;
-    orderModel: OrderModel;
+    orderModel: IOrderModel;
     productModel: IProductModel;
-    
-    // 需要transaction 的功能 這功能是由 app來 所以設定街口
+
+    // 第二步 使用static 回傳 createController = () =>
+    public static createController({
+        knexSql,
+        productModel,
+        orderModel,
+     }: {
+        knexSql: Knex;
+        orderModel: IOrderModel;
+        productModel: IProductModel;
+    }) {
+        // 環傳新方法所以參數一樣   knexSql,productModel,orderModel
+        return new OrderController({ knexSql,productModel,orderModel });
+    }
+
+
     constructor({
         knexSql,
         productModel,
         orderModel,
     }: {
         knexSql: Knex;
-        orderModel: OrderModel;
+        orderModel: IOrderModel;
         productModel: IProductModel;
     }) {
         this.knexSql = knexSql;
@@ -48,7 +66,7 @@ export class OrderController implements IOrderController {
     public createOrder: IOrderController["createOrder"] = (req,res,_next)  => {
         // 傳入的參數要有特性  { 商品名稱, 數量, 使用paymentProvider , paymentWay }
         let { paymentProvider, PaymentPay, contents } = req.body;
-        req.body.
+         console.log(paymentProvider,PaymentPay,contents);
         // contents [ {id, amount, price, }, ... ] 補上格式
 
     }
