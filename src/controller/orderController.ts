@@ -5,7 +5,7 @@ import { Knex } from "knex";
 
 interface CreateOrderRequestParams {
     paymentProvider: PaymentProvider;
-    PaymentPay: PaymentPay;
+    paymentPay: PaymentPay;
     contents: OrderContent[];
     // clientRedirect: string;
 }
