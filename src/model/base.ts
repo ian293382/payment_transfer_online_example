@@ -5,6 +5,7 @@ import { camelCase, isEmpty, mapKeys, mapValues, snakeCase } from "lodash";
 // T 在這個階段，先不要給他真正的類別; 而是等檔其他繼承他的Class 要用到的時候再傳入型別;
 // database transaction (trx任意縮寫 Knex.Transaction) 資料庫交易 => 保證多表格的欄位變動可以一起完成 或失敗
 // select 找一筆定癲 , update 將錢轉出, create 創建 Log , select 找出更新訂單, ...
+// read 分為 find all , find one
 export interface IBase<T> {
     findAll(trx?: Knex.Transaction): Promise<T[] | null>;
     findOne(id: any, trx?: Knex.Transaction): Promise<T | null>;

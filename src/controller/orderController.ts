@@ -65,8 +65,12 @@ export class OrderController implements IOrderController {
     // 開一個Order api 接口
     public createOrder: IOrderController["createOrder"] = (req,res,_next)  => {
         // 傳入的參數要有特性  { 商品名稱, 數量, 使用paymentProvider , paymentWay }
-        let { paymentProvider, PaymentPay, contents } = req.body;
-         console.log(paymentProvider,PaymentPay,contents);
+        let { paymentProvider, paymentPay, contents } = req.body;
+        console.log(
+            paymentProvider,
+            paymentPay,
+            contents);
+        res.json({ status: 'success' });
         // contents [ {id, amount, price, }, ... ] 補上格式
 
     }
