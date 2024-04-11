@@ -117,7 +117,7 @@ export class OrderController implements IOrderController {
             paymentProvider,
             paymentPay,
             contents);
-
+        // 1.資料驗證
         // https://express-validator.github.io/docs/guides/getting-started
         // validationResult 才能達到驗證後效果
      
@@ -125,6 +125,8 @@ export class OrderController implements IOrderController {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+        // 2.資料處理 將資料傳入database translation資料庫交易
+
         
      
         res.json({ status: 'success' });
