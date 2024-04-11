@@ -19,7 +19,7 @@ export enum OrderStatus {
 
 }
 export interface OrderContent {
-    product: number;
+    productId: number;
     amount: number;
     price: number;
 }
