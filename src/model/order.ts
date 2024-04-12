@@ -40,6 +40,7 @@ export interface Order {
 // 補實作 IOrderModel
 export interface IOrderModel extends IBase<Order>{
     // 目前沒有新功能 就保持空值
+    create(data: Order, trx?: Knex.Transaction): Promise< Order | null>;
 }
 
 // 上述定義 下面要實作他的方法 
@@ -47,14 +48,14 @@ export class OrderModel extends Base<Order>  implements IOrderModel{
     tableName = 'orders';
     // 要把功能寫出來時 記得js裡面是 駝峰裝的key值 ，資料庫判別適用底線命名的 左邊 js = database
     protected schema = {
-        id: `id`,
-        total: `total`,
-        createdAt: `created_at`,
-        updatedAt: `updated_at`,
-        paymentProvider:  `payment_provider`,
-        paymentPay: `Payment_pay`,
-        status:  `status`,
-        contents: `contents`,       
+        id: 'id',
+        total: 'total',
+        createdAt: 'created_at',  // 確保這里是底線命名
+        updatedAt: 'updated_at',  // 確保這里是底線命名
+        paymentProvider: 'payment_provider',
+        paymentPay: 'payment_pay',
+        status: 'status',
+        contents: 'contents',       
     };
 
     static createModel = ({ 

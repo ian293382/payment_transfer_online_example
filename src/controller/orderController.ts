@@ -1,9 +1,11 @@
-import { IOrderModel, OrderContent, OrderModel, PaymentPay, PaymentProvider } from "@/model/order";
+import { IOrderModel, OrderContent, OrderModel, OrderStatus, PaymentPay, PaymentProvider } from "@/model/order";
 import { IProductModel } from "@/model/product";
 import { NextFunction, Request, Response } from "express";
 import { Knex } from "knex";
-import { isEmpty } from "lodash";
+import { isEmpty, pick } from "lodash";
 import { body, ValidationChain,validationResult } from "express-validator"
+import { genUID, transactionHandler } from "@/utils";
+
 
 interface CreateOrderRequestParams {
     paymentProvider: PaymentProvider;
@@ -109,14 +111,11 @@ export class OrderController implements IOrderController {
 
 
     // 開一個Order api 接口
-    public createOrder: IOrderController["createOrder"] = (req,res,_next)  => {
+    public createOrder: IOrderController["createOrder"] = async (req,res,_next)  => {
         // 傳入的參數要有特性  { 商品名稱, 數量, 使用paymentProvider , paymentWay }
         // contents [ {id, amount, price, }, ... ] 補上格式 
         let { paymentProvider, paymentPay, contents } = req.body;
-        console.log(
-            paymentProvider,
-            paymentPay,
-            contents);
+  
         // 1.資料驗證
         // https://express-validator.github.io/docs/guides/getting-started
         // validationResult 才能達到驗證後效果
@@ -126,8 +125,50 @@ export class OrderController implements IOrderController {
             return res.status(400).json({ errors: errors.array() });
         }
         // 2.資料處理 將資料傳入database translation資料庫交易
+        // 先做try catch
+        try {
+            // transaction  transactionHandler會把 knex 放入 驗證 產生instance
+            //  傳到 callback func 給其他task使用 到 execTransaction 確定沒問題了  trx.commit 寫入資料庫 回傳commit的值 show出來
+            await transactionHandler(this.knexSql, async (trx: Knex.Transaction) => {
+                // 要將content 裡面的 product 拆包 拆出來 
+                const result =await Promise.all(
+                    contents.map(
+                        async (product) =>
+                    await this.productModel.preSell(
+                        {
+                            id: product.productId,
+                            ...pick(product,["price", "amount"]),
+                        },
+                        trx
+                        )
+                    )
+                );
+                
+                if (result.some((result) => !result)) 
+                    throw new Error("Cannot buy , because out of stuff.");  
+                const totalPrice = contents.reduce(
+                    (acc, product) => acc + product.price * product.amount,
+                     0  
+                );
+                // 創建的UUID 需要亂碼 創建 uuid
+                const uid = genUID()
+                await this.orderModel.create({
+                    id: uid,
+                    total: totalPrice,
+                    created_at: new Date(),
+                    updated_at: new Date(), 
+                    payment_provider: paymentProvider,
+                    payment_pay: paymentPay,
+                    status: OrderStatus.WAITING,
+                    contents, 
+                }, trx);
 
-        
+                res.json({ status: "success"});
+            })
+        } catch (err) {
+            res.status(500).json({ errors: err})
+            throw err;
+        }
      
         res.json({ status: 'success' });
     }

@@ -39,19 +39,28 @@ export abstract class Base<T> implements IBase<T> {
         return result.map(this.DBData2DataObject) as T[];
     }
     public findOne = async (id: any, trx?: Knex.Transaction) => {
-        let sqlBuilder = this.knexSql(this.tableName).select(this.schema).where(id);
+        let sqlBuilder = this.knexSql(this.tableName)
+        .select(this.schema)
+        .where({ id });
+
         if (trx)  sqlBuilder = sqlBuilder.transacting(trx);
         const result = await sqlBuilder;
         if (isEmpty(result)) return null; 
-        
+
         return this.DBData2DataObject(result[0]) as T;
     }
     public create = async (data: Omit<T, 'id'>, trx? : Knex.Transaction) => {
         // 注意data 是 object => DB data 轉成可以寫入DB格式
-        let sqlBuilder = this.knexSql(this.tableName).insert(this.DataObject2DBData(data));
+        let sqlBuilder = this.knexSql(this.tableName).insert(
+            this.DataObject2DBData(data)
+            );
+             
+        // console.log(data) 到這邊都沒問題
         if (trx)  sqlBuilder = sqlBuilder.transacting(trx);
 
         const result = await sqlBuilder;
+     
+
         if (isEmpty(result)) return null; 
         const id = result[0]; // 我們設計的id 就是第一格
 
@@ -85,11 +94,14 @@ export abstract class Base<T> implements IBase<T> {
     }
     private DataObject2DBData = (data: any) => {
         const transform = mapValues(data, (value, key) => {
-            if (['updatedAT', 'createdAT'].includes(key)) return value.toISOString();
-
-            if (isJson(value)) return JSON.parse(value);
-
-            return value
+            if (['updatedAt', 'createdAt'].includes(key)) {
+                return value.toISOString();
+            }
+            // check if a string is json
+            if (value !== null && typeof value === 'object') {
+                return JSON.stringify(value);
+            }
+            return value;
         }); 
         // 反轉成 updated_at created_at snakeCase 
         return mapKeys(transform, (value, key) => snakeCase(key));

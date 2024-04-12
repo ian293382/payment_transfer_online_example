@@ -1,4 +1,5 @@
 import knex, { Knex } from "knex";
+import { v4 as uuid } from "uuid";
 
 enum ISOLATION_LEVEL {
     READ_UNCOMMITTED = 'read-uncommitted',
@@ -52,7 +53,7 @@ export const transactionHandler = async <T = any> (
     let attempts = 0;
 
     // 啟動transaction 
-    const execTransaction = async () => {
+    const execTransaction = async (): Promise<T> => {
         const trx = await knex.transaction();
 
         try {
@@ -78,8 +79,30 @@ export const transactionHandler = async <T = any> (
             return execTransaction();
          }
     };
+
+    // 記得補上執行這個task 他經過knex 要上await
+    return await execTransaction(); 
 }
 
+// 新增sleep 函式
 function sleep(maxBackOff: number) {
     return new Promise((resolve) => setTimeout(resolve, maxBackOff));
+}
+
+// gen uuid 實作過程
+export const genUID = () => {
+    // timestamp 13 位數 ＋ 7 gen uuid 
+    // 123456789 => 1a3b....
+    const alpha = "abcdefghij";
+
+    const timestampStr = new Date().getTime().toString();
+    
+    const code = timestampStr.split("") // ["1","2","3"...]
+        .map((v, index) => index % 2 ? v : alpha[Number(v)]) // ['1','b','3','d',...]
+        .join("")
+
+
+    const id = uuid().split("-")[0];
+
+    return `${code}${id.substring(0, id.length - 1)}`;
 }
