@@ -20,13 +20,16 @@ interface CreateOrderRequestParams {
 export interface IOrderController {
     createOrderValidator(): ValidationChain[];
     createOrder(
+        //  這些定義其實都自起命名 你選你要用的之後呼叫就好
         req: Request<any, any, CreateOrderRequestParams, any>,
         res: Response,
-        next: NextFunction): void;
+        next: NextFunction
+    ): void;
     updateOrder(
         req: Request<any, any, any, any>,
         res: Response,
-        next: NextFunction): void;
+        next: NextFunction
+    ): void;
 }
 
 // 實作功能 implements
@@ -36,7 +39,7 @@ export class OrderController implements IOrderController {
     orderModel: IOrderModel;
     productModel: IProductModel;
 
-    // 第二步 使用static 回傳 createController = () =>
+    // 第二步 使用static 回傳 createController = () => new OrderController
     public static createController({
         knexSql,
         productModel,
@@ -60,6 +63,7 @@ export class OrderController implements IOrderController {
         orderModel: IOrderModel;
         productModel: IProductModel;
     }) {
+        // 先存資料
         this.knexSql = knexSql;
         this.orderModel = orderModel;
         this.productModel = productModel;
@@ -70,7 +74,8 @@ export class OrderController implements IOrderController {
 
     // 做驗證 用套件 express validation
     public createOrderValidator = () => {
-        // 第一條規則有沒有符合 以此類推 
+        // 第一條規則有沒有符合 以此類推
+        // console.log('validate start') 
         const paymentProviderValidator = (value : any) => {
             // 使用 . => 是否有函式在裡面 有的話 True 沒有 False
             return [PaymentProvider.ECPAY, PaymentProvider.Paypal].includes(value); 
@@ -83,7 +88,7 @@ export class OrderController implements IOrderController {
         const contentsValidator = (value :  OrderContent[]) => {
             // 第一個要有資料
             if (isEmpty(value)) false;
-
+           
             // 查看內容 一開始改value OrderContent[]
             for (const product of value) {
                 if (
@@ -93,6 +98,7 @@ export class OrderController implements IOrderController {
             } 
             return true;
             // 設定 驗證不同參數的
+            
         };
         return [
             // 設定不同參數的內容合不合法 body是從 express-validator 調用
@@ -151,18 +157,18 @@ export class OrderController implements IOrderController {
                      0  
                 );
                 // 創建的UUID 需要亂碼 創建 uuid
-                const uid = genUID()
-                await this.orderModel.create({
-                    id: uid,
-                    total: totalPrice,
-                    created_at: new Date(),
-                    updated_at: new Date(), 
-                    payment_provider: paymentProvider,
-                    payment_pay: paymentPay,
-                    status: OrderStatus.WAITING,
-                    contents, 
-                }, trx);
-
+                // const uid = genUID()
+                // await this.orderModel.create({
+                //     id: uid,
+                //     total: totalPrice,
+                //     created_at: new Date(),
+                //     updated_at: new Date(), 
+                //     paymentProvider,
+                //     paymentPay,
+                //     status:OrderStatus.WAITING,
+                //     contents, 
+                // }, trx);
+          
                 res.json({ status: "success"});
             })
         } catch (err) {

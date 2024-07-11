@@ -38,33 +38,71 @@ export abstract class Base<T> implements IBase<T> {
         
         return result.map(this.DBData2DataObject) as T[];
     }
+    // public findOne = async (id: any, trx?: Knex.Transaction) => {
+    //     let sqlBuilder = this.knexSql(this.tableName)
+    //     .select(this.schema)
+    //     .where({ id });
+
+    //     if (trx)  sqlBuilder = sqlBuilder.transacting(trx);
+
+    //     console.log('---->1')
+    //     const result = await sqlBuilder;
+    //     console.log('---->2')
+    //     if (isEmpty(result)) return null; 
+        
+
+    //     return this.DBData2DataObject(result[0]) as T;
+    // }
     public findOne = async (id: any, trx?: Knex.Transaction) => {
         let sqlBuilder = this.knexSql(this.tableName)
-        .select(this.schema)
-        .where({ id });
-
-        if (trx)  sqlBuilder = sqlBuilder.transacting(trx);
+            .select(this.schema)  // 确保 schema 定义了要查询的列
+            .where({ id });
+    
+        if (trx) {
+            sqlBuilder = sqlBuilder.transacting(trx);
+        }
+    
         const result = await sqlBuilder;
-        if (isEmpty(result)) return null; 
-
+        if (isEmpty(result)) return null;
         return this.DBData2DataObject(result[0]) as T;
     }
-    public create = async (data: Omit<T, 'id'>, trx? : Knex.Transaction) => {
-        // 注意data 是 object => DB data 轉成可以寫入DB格式
-        let sqlBuilder = this.knexSql(this.tableName).insert(
-            this.DataObject2DBData(data)
-            );
+    // public create = async (data: Omit<T, 'id'>, trx? : Knex.Transaction) => {
+    //     // 注意data 是 object => DB data 轉成可以寫入DB格式
+    //     let sqlBuilder = this.knexSql(this.tableName).insert(
+    //         this.DataObject2DBData(data)
+    //         );
              
-        // console.log(data) 到這邊都沒問題
-        if (trx)  sqlBuilder = sqlBuilder.transacting(trx);
+    //     console.log('data:',data)
+    //     if (trx)  sqlBuilder = sqlBuilder.transacting(trx);
 
-        const result = await sqlBuilder;
-     
+    //     const result = await sqlBuilder;
+        
+       
+    //     if (isEmpty(result)) return null; 
+    //     const id = result[0]; // 我們設計的id 就是第一格
+        
+    //     console.log('id: ', result)
 
-        if (isEmpty(result)) return null; 
-        const id = result[0]; // 我們設計的id 就是第一格
-
-        return await this.findOne(id, trx);
+    //     return await this.findOne(id, trx);
+    // }
+    public create = async (data: Omit<T, 'id'>, trx?: Knex.Transaction) => {
+        let sqlBuilder = this.knexSql(this.tableName)
+            .insert(this.DataObject2DBData(data))
+            .returning('id');  
+    
+        if (trx) {
+            sqlBuilder = sqlBuilder.transacting(trx);
+        }
+    
+        try {
+            const result = await sqlBuilder;
+            if (isEmpty(result)) return null;
+            const id = result[0];  // 獲取新對象的 ID
+            return await this.findOne(id, trx);
+        } catch (error) {
+            console.error("Error during the create operation:", error);
+            throw error;
+        }
     }
     public update = async  (id: any, data: Partial<Omit <T, 'id'>>, trx?: Knex.Transaction) => {
         let sqlBuilder = this.knexSql(this.tableName).update(this.DataObject2DBData(data)).where({id});
@@ -92,6 +130,8 @@ export abstract class Base<T> implements IBase<T> {
 
         return mapKeys(transform, (value, key) => camelCase(key));
     }
+
+    
     private DataObject2DBData = (data: any) => {
         const transform = mapValues(data, (value, key) => {
             if (['updatedAt', 'createdAt'].includes(key)) {

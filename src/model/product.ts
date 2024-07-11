@@ -53,4 +53,6 @@ export class ProductModel extends  Base<Product>  implements IProductModel{
                 // 回傳布林值
             return !!result;
     };
+
+    
 }

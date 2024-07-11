@@ -18,6 +18,8 @@ export enum OrderStatus {
     CANCEL = "CANCEL",
 
 }
+
+// json 格式
 export interface OrderContent {
     productId: number;
     amount: number;
@@ -33,7 +35,7 @@ export interface Order {
     payment_provider:  PaymentProvider;
     payment_pay: PaymentPay;
     status:  OrderStatus;
-    contents: OrderContent[];
+    contents: OrderContent[]; //json
 }
 
 
@@ -47,7 +49,7 @@ export interface IOrderModel extends IBase<Order>{
 export class OrderModel extends Base<Order>  implements IOrderModel{
     tableName = 'orders';
     // 要把功能寫出來時 記得js裡面是 駝峰裝的key值 ，資料庫判別適用底線命名的 左邊 js = database
-    protected schema = {
+    schema = {
         id: 'id',
         total: 'total',
         createdAt: 'created_at',  // 確保這里是底線命名
